@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies"
+      - apt-get update -y                      # Update package list
+      - apt-get install -y apache2             # Install Apache2 (httpd)
+
+  pre_build:
+    commands:
+      - echo "Starting Apache server"
+      - apache2ctl start                       # Start Apache using apache2ctl (instead of systemctl)
+      - apache2ctl configtest                  # Test Apache config to ensure no errors
+
+  build:
+    commands:
+      - echo "Deploying the application"
+      - cp -r * /var/www/html/                 # Copy website files to Apache root directory
+
+  post_build:
+    commands:
+      - echo "Build complete. Restarting Apache to apply changes."
+      - apache2ctl restart                     # Restart Apache using apache2ctl
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
